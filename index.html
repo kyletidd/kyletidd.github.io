@@ -17,11 +17,12 @@
       align-items: center;
     }
     img {
-        max-width: 75%;
-        max-height: 75vh;
-        display: block;
-        margin: 0 auto;
-        cursor: pointer;
+      max-width: 75%;
+      max-height: 75vh;
+      display: block;
+      margin: 0 auto;
+      cursor: pointer;
+      transition: opacity 300ms ease; /* smooth fade */
     }
   </style>
 </head>
@@ -30,6 +31,10 @@
   <img id="artwork" src="" alt="Artwork" />
 
   <script>
+    // if your images are in /images/, set basePath = '/images/'
+    const basePath = ''; 
+
+    // tip: standardise to lowercase extensions on disk if possible
     const images = [
       '20241203091002_001_C.jpg',
       '20241203083125_001_C.jpg',
@@ -72,33 +77,48 @@
       '20241203090259_001.jpg'
     ];
 
-    const imgElement = document.getElementById('artwork');
+    const imgEl = document.getElementById('artwork');
+    let pool = [...images]; // mutable copy for pruning broken images
 
-    function getRandomImage(exclude) {
+    function encodedSrc(filename) {
+      // encodeURI preserves slashes, encodes spaces -> %20 etc.
+      return basePath + encodeURI(filename);
+    }
+
+    function getRandom(exclude) {
+      if (pool.length === 0) return null;
+      if (pool.length === 1) return pool[0];
       let next;
       do {
-        next = images[Math.floor(Math.random() * images.length)];
-      } while (next === exclude && images.length > 1);
+        next = pool[Math.floor(Math.random() * pool.length)];
+      } while (next === exclude);
       return next;
     }
 
-    // set a random image on page load
+    function showImage(filename) {
+      if (!filename) return;
+      imgEl.style.opacity = 0;
+      const src = encodedSrc(filename);
+      // set up handlers before assigning src to catch immediate events
+      imgEl.onload = () => { imgEl.style.opacity = 1; };
+      imgEl.onerror = () => {
+        console.warn('failed to load:', filename, '→ removing from pool');
+        // remove bad filename from pool
+        pool = pool.filter(f => f !== filename);
+        // try another
+        const retry = getRandom(null);
+        showImage(retry);
+      };
+      imgEl.src = src;
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
-      const random = getRandomImage();
-      imgElement.src = random;
+      showImage(getRandom(null));
     });
 
-    // shuffle to a new image on click
-    imgElement.addEventListener('click', () => {
-      imgElement.style.opacity = 0;
-      setTimeout(() => {
-        const current = imgElement.src.split('/').pop();
-        const next = getRandomImage(current);
-        imgElement.src = next;
-        imgElement.onload = () => {
-          imgElement.style.opacity = 1;
-        };
-      }, 300);
+    imgEl.addEventListener('click', () => {
+      const current = imgEl.src.split('/').pop();
+      showImage(getRandom(current));
     });
   </script>
 
