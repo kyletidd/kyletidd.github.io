@@ -22,37 +22,19 @@
       display: block;
       margin: 0 auto;
       cursor: pointer;
-      transition: opacity 300ms ease;
-    }
-
-    /* --- new: tiny upper-left contents link --- */
-    .nav-link {
-      position: fixed;
-      top: 1rem;
-      left: 1rem;
-      font-family: monospace;
-      font-size: 10px;
-      color: #000;
-      text-decoration: none;
-      opacity: 0.7;
-      transition: opacity 120ms ease;
-      z-index: 10;
-    }
-    .nav-link:hover {
-      opacity: 1;
+      transition: opacity 300ms ease; /* smooth fade */
     }
   </style>
 </head>
-
 <body>
-
-  <a class="nav-link" href="contents.html">contents</a>
 
   <img id="artwork" src="" alt="Artwork" />
 
   <script>
+    // if your images are in /images/, set basePath = '/images/'
     const basePath = ''; 
 
+    // tip: standardise to lowercase extensions on disk if possible
     const images = [
       '20241203091002_001_C.jpg',
       '20241203083125_001_C.jpg',
@@ -98,9 +80,10 @@
     ];
 
     const imgEl = document.getElementById('artwork');
-    let pool = [...images];
+    let pool = [...images]; // mutable copy for pruning broken images
 
     function encodedSrc(filename) {
+      // encodeURI preserves slashes, encodes spaces -> %20 etc.
       return basePath + encodeURI(filename);
     }
 
@@ -118,11 +101,15 @@
       if (!filename) return;
       imgEl.style.opacity = 0;
       const src = encodedSrc(filename);
+      // set up handlers before assigning src to catch immediate events
       imgEl.onload = () => { imgEl.style.opacity = 1; };
       imgEl.onerror = () => {
         console.warn('failed to load:', filename, '→ removing from pool');
+        // remove bad filename from pool
         pool = pool.filter(f => f !== filename);
-        showImage(getRandom(null));
+        // try another
+        const retry = getRandom(null);
+        showImage(retry);
       };
       imgEl.src = src;
     }
