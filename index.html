@@ -9,120 +9,105 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      background: #fff;
-    }
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    img {
-      max-width: 75%;
-      max-height: 75vh;
-      display: block;
-      margin: 0 auto;
+      width: 100%;
+      background-color: #fff;
+      transition: background-image 300ms ease, opacity 300ms ease;
       cursor: pointer;
-      transition: opacity 300ms ease; /* smooth fade */
+      /* the infinite repeat */
+      background-repeat: repeat;
+      background-position: 0 0;
+      /* adjust this to control "zoom" */
+      background-size: 1200px; 
     }
   </style>
 </head>
 <body>
+<script>
+  const basePath = '';
 
-  <img id="artwork" src="" alt="Artwork" />
+  const images = [
+    '20241203091002_001_C.jpg',
+    '20241203083125_001_C.jpg',
+    '20241118144232_001_C.jpg',
+    '20241203091812_001_C.jpg',
+    '20241203091914_001_C.jpg',
+    '20241203091724_001_C.jpg',
+    '20241203091219_001_C.jpg',
+    '20241203091132_001_C.jpg',
+    '20241203091047_001_C.jpg',
+    '20241203090918_001-2.jpg',
+    '20241203090833_001-2.jpg',
+    '20241203090655_001.jpg',
+    '20241203090746_001.jpg',
+    '20241203083940_001.jpg',
+    '20241203084033_001.jpg',
+    '20241118143953_001.jpg',
+    '20241118144339_001.jpg',
+    '20241203085715_001.jpg',
+    '20241203085644_001.jpg',
+    '20241203083748_001.jpg',
+    '20241203083431_001.jpg',
+    '20241203083334_001.jpg',
+    '20241203083845_001.jpg',
+    '20241203085134_001.jpg',
+    '20241203090128_001.jpg',
+    '000065400006 C.jpg',
+    '000065400007 C.jpg',
+    '000065400013 C.jpg',
+    'IMG_0778.JPG',
+    'IMG_3238.jpg',
+    'IMG_3237.jpg',
+    'IMG_1366.jpg',
+    'IMG_3242.JPG',
+    'IMG_0960.jpg',
+    'IMG_0514 2.JPG',
+    'IMG_0513.JPG',
+    '20250831145737_002.jpg',
+    '20241203090259_001.jpg',
+    'IMG_3650.jpg',
+    '20250914101539_001.jpg',
+    '20250921093719_001.jpg'
+  ];
 
-  <script>
-    // if your images are in /images/, set basePath = '/images/'
-    const basePath = ''; 
+  let pool = [...images];
 
-    // tip: standardise to lowercase extensions on disk if possible
-    const images = [
-      '20241203091002_001_C.jpg',
-      '20241203083125_001_C.jpg',
-      '20241118144232_001_C.jpg',
-      '20241203091812_001_C.jpg',
-      '20241203091914_001_C.jpg',
-      '20241203091724_001_C.jpg',
-      '20241203091219_001_C.jpg',
-      '20241203091132_001_C.jpg',
-      '20241203091047_001_C.jpg',
-      '20241203090918_001-2.jpg',
-      '20241203090833_001-2.jpg',
-      '20241203090655_001.jpg',
-      '20241203090746_001.jpg',
-      '20241203083940_001.jpg',
-      '20241203084033_001.jpg',
-      '20241118143953_001.jpg',
-      '20241118144339_001.jpg',
-      '20241203085715_001.jpg',
-      '20241203085644_001.jpg',
-      '20241203083748_001.jpg',
-      '20241203083431_001.jpg',
-      '20241203083334_001.jpg',
-      '20241203083845_001.jpg',
-      '20241203085134_001.jpg',
-      '20241203090128_001.jpg',
-      '000065400006 C.jpg',
-      '000065400007 C.jpg',
-      '000065400013 C.jpg',
-      'IMG_0778.JPG',
-      'IMG_3238.jpg',
-      'IMG_3237.jpg',
-      'IMG_1366.jpg',
-      'IMG_3242.JPG',
-      'IMG_0960.jpg',
-      'IMG_0514 2.JPG',
-      'IMG_0513.JPG',
-      '20250831145737_002.jpg',
-      '20241203090259_001.jpg',
-      'IMG_3650.jpg',
-      '20250914101539_001.jpg',
-      '20250921093719_001.jpg'
-    ];
+  function encodedSrc(filename) {
+    return basePath + encodeURI(filename);
+  }
 
-    const imgEl = document.getElementById('artwork');
-    let pool = [...images]; // mutable copy for pruning broken images
+  function getRandom(exclude) {
+    if (pool.length === 0) return null;
+    if (pool.length === 1) return pool[0];
+    let next;
+    do {
+      next = pool[Math.floor(Math.random() * pool.length)];
+    } while (next === exclude);
+    return next;
+  }
 
-    function encodedSrc(filename) {
-      // encodeURI preserves slashes, encodes spaces -> %20 etc.
-      return basePath + encodeURI(filename);
-    }
+  function showRandom() {
+    const current = document.body.style.backgroundImage.replace(/url\(["']?/, '').replace(/["']?\)/, '');
+    const next = getRandom(current);
+    const src = encodedSrc(next);
 
-    function getRandom(exclude) {
-      if (pool.length === 0) return null;
-      if (pool.length === 1) return pool[0];
-      let next;
-      do {
-        next = pool[Math.floor(Math.random() * pool.length)];
-      } while (next === exclude);
-      return next;
-    }
+    // preload the image to avoid flashing
+    const img = new Image();
+    img.onload = () => {
+      document.body.style.opacity = 0;
+      setTimeout(() => {
+        document.body.style.backgroundImage = `url("${src}")`;
+        document.body.style.opacity = 1;
+      }, 150);
+    };
+    img.onerror = () => {
+      pool = pool.filter(f => f !== next);
+      showRandom();
+    };
+    img.src = src;
+  }
 
-    function showImage(filename) {
-      if (!filename) return;
-      imgEl.style.opacity = 0;
-      const src = encodedSrc(filename);
-      // set up handlers before assigning src to catch immediate events
-      imgEl.onload = () => { imgEl.style.opacity = 1; };
-      imgEl.onerror = () => {
-        console.warn('failed to load:', filename, '→ removing from pool');
-        // remove bad filename from pool
-        pool = pool.filter(f => f !== filename);
-        // try another
-        const retry = getRandom(null);
-        showImage(retry);
-      };
-      imgEl.src = src;
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      showImage(getRandom(null));
-    });
-
-    imgEl.addEventListener('click', () => {
-      const current = imgEl.src.split('/').pop();
-      showImage(getRandom(current));
-    });
-  </script>
-
+  window.addEventListener('DOMContentLoaded', showRandom);
+  document.body.addEventListener('click', showRandom);
+</script>
 </body>
 </html>
