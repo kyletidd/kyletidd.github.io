@@ -87,6 +87,22 @@
       padding: 4px;
     }
 
+    #lb-prev, #lb-next {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #111;
+      font-family: inherit;
+      padding: 12px;
+      z-index: 201;
+    }
+    #lb-prev { left: 16px; }
+    #lb-next { right: 16px; }
+
     footer {
       padding: 0 20px 32px;
       font-size: 12px;
@@ -119,7 +135,9 @@
 
 <div id="lightbox">
   <button id="lightbox-close">Close</button>
+  <button id="lb-prev">←</button>
   <img id="lightbox-img" src="" alt="" />
+  <button id="lb-next">→</button>
 </div>
 
 <script>
@@ -172,7 +190,18 @@
   const lightboxImg = document.getElementById('lightbox-img');
   const lightboxClose = document.getElementById('lightbox-close');
 
-  images.forEach(src => {
+  let current = 0;
+
+  function openLightbox(i) {
+    current = i;
+    lightboxImg.src = encodeURI(images[current]);
+    lightbox.classList.add('open');
+  }
+
+  function prev() { current = (current - 1 + images.length) % images.length; lightboxImg.src = encodeURI(images[current]); }
+  function next() { current = (current + 1) % images.length; lightboxImg.src = encodeURI(images[current]); }
+
+  images.forEach((src, i) => {
     const article = document.createElement('article');
     article.className = 'index-item';
 
@@ -180,21 +209,27 @@
     img.src = encodeURI(src);
     img.alt = '';
     img.loading = 'lazy';
-    img.addEventListener('click', () => {
-      lightboxImg.src = encodeURI(src);
-      lightbox.classList.add('open');
-    });
+    img.addEventListener('click', () => openLightbox(i));
 
     article.appendChild(img);
     index.appendChild(article);
   });
 
   lightbox.addEventListener('click', e => {
-    if (e.target !== lightboxImg) lightbox.classList.remove('open');
+    if (e.target === lightboxImg) return;
+    if (e.target.id === 'lb-prev') { prev(); return; }
+    if (e.target.id === 'lb-next') { next(); return; }
+    if (e.target.id === 'lightbox-close') return;
+    lightbox.classList.remove('open');
   });
+
   lightboxClose.addEventListener('click', () => lightbox.classList.remove('open'));
+
   document.addEventListener('keydown', e => {
+    if (!lightbox.classList.contains('open')) return;
     if (e.key === 'Escape') lightbox.classList.remove('open');
+    if (e.key === 'ArrowLeft') prev();
+    if (e.key === 'ArrowRight') next();
   });
 </script>
 </body>
