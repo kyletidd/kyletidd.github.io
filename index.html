@@ -71,6 +71,217 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      width: 100%;
+      padding: 0 48px;
+    }
+
+    #lightbox img {
+      max-width: 100%;
+      max-height: 85vh;
+      object-fit: contain;
+      display: block;
+    }
+
+    #lightbox-close {
+      position: fixed;
+      top: 18px;
+      right: 20px;
+      font-size: 14px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #111;
+      font-family: inherit;
+      padding: 4px;
+    }
+
+    #lb-prev, #lb-next {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #111;
+      font-family: inherit;
+      padding: 16px;
+      z-index: 201;
+      line-height: 1;
+    }
+    #lb-prev { left: 0; }
+    #lb-next { right: 0; }
+
+    footer {
+      padding: 0 20px 32px;
+      font-size: 12px;
+      color: #999;
+    }
+
+    @media (min-width: 768px) {
+      .index-item { padding: 64px 40px 0; max-width: 900px; }
+      header { padding: 20px 40px 16px; }
+      footer { padding: 0 40px 40px; }
+    }
+
+    @media (min-width: 1200px) {
+      .index-item { max-width: 780px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="site-title" href="#">Kyle Tidd</a>
+  <nav>
+    <a href="https://www.instagram.com/kyletidd" target="_blank" rel="noopener noreferrer">Contact</a>
+  </nav>
+</header>
+
+<main id="index"></main>
+
+<footer><p>© Kyle Tidd</p></footer>
+
+<div id="lightbox">
+  <button id="lightbox-close">Close</button>
+  <div id="lb-image-row">
+    <button id="lb-prev">&lt;</button>
+    <img id="lightbox-img" src="" alt="" />
+    <button id="lb-next">&gt;</button>
+  </div>
+</div>
+
+<script>
+  const images = [
+    '20241203091002_001_C.jpg',
+    '20241203083125_001_C.jpg',
+    '20241118144232_001_C.jpg',
+    '20241203091812_001_C.jpg',
+    '20241203091914_001_C.jpg',
+    '20241203091724_001_C.jpg',
+    '20241203091219_001_C.jpg',
+    '20241203091132_001_C.jpg',
+    '20241203091047_001_C.jpg',
+    '20241203090918_001-2.jpg',
+    '20241203090833_001-2.jpg',
+    '20241203090655_001.jpg',
+    '20241203090746_001.jpg',
+    '20241203083940_001.jpg',
+    '20241203084033_001.jpg',
+    '20241118143953_001.jpg',
+    '20241118144339_001.jpg',
+    '20241203085715_001.jpg',
+    '20241203085644_001.jpg',
+    '20241203083748_001.jpg',
+    '20241203083431_001.jpg',
+    '20241203083334_001.jpg',
+    '20241203083845_001.jpg',
+    '20241203085134_001.jpg',
+    '20241203090128_001.jpg',
+    '000065400006 C.jpg',
+    '000065400007 C.jpg',
+    '000065400013 C.jpg',
+    'IMG_0778.JPG',
+    'IMG_3238.jpg',
+    'IMG_3237.jpg',
+    'IMG_1366.jpg',
+    'IMG_3242.JPG',
+    'IMG_0960.jpg',
+    'IMG_0514 2.JPG',
+    'IMG_0513.JPG',
+    '20250831145737_002.jpg',
+    '20241203090259_001.jpg',
+    'IMG_3650.jpg',
+    '20250914101539_001.jpg',
+    '20250921093719_001.jpg',
+  ];
+
+  const index = document.getElementById('index');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxClose = document.getElementById('lightbox-close');
+
+  let current = 0;
+
+  function openLightbox(i) {
+    current = i;
+    lightboxImg.src = encodeURI(images[current]);
+    lightbox.classList.add('open');
+  }
+
+  function prev() { current = (current - 1 + images.length) % images.length; lightboxImg.src = encodeURI(images[current]); }
+  function next() { current = (current + 1) % images.length; lightboxImg.src = encodeURI(images[current]); }
+
+  images.forEach((src, i) => {
+    const article = document.createElement('article');
+    article.className = 'index-item';
+
+    const img = document.createElement('img');
+    img.src = encodeURI(src);
+    img.alt = '';
+    img.loading = 'lazy';
+    img.addEventListener('click', () => openLightbox(i));
+
+    article.appendChild(img);
+    index.appendChild(article);
+  });
+
+  lightbox.addEventListener('click', e => {
+    if (e.target === lightboxImg) return;
+    if (e.target.id === 'lb-prev') { prev(); return; }
+    if (e.target.id === 'lb-next') { next(); return; }
+    if (e.target.id === 'lightbox-close') return;
+    if (e.target.id === 'lb-image-row') return;
+    lightbox.classList.remove('open');
+  });
+
+  lightboxClose.addEventListener('click', () => lightbox.classList.remove('open'));
+
+  document.addEventListener('keydown', e => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') lightbox.classList.remove('open');
+    if (e.key === 'ArrowLeft') prev();
+    if (e.key === 'ArrowRight') next();
+  });
+</script>
+</body>
+</html>    nav a { font-size: 14px; color: #111; text-decoration: none; }
+    nav a:hover { text-decoration: underline; }
+
+    main { padding-top: 54px; }
+
+    .index-item {
+      padding: 48px 20px 0;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .index-item:last-child { padding-bottom: 80px; }
+
+    .index-item img {
+      display: block;
+      width: 100%;
+      height: auto;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+    }
+    .index-item img:hover { opacity: 0.92; }
+
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      z-index: 200;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #lightbox.open { display: flex; }
+
+    #lb-image-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       gap: 16px;
       width: 100%;
       padding: 0 12px;
