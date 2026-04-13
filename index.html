@@ -1,5 +1,21 @@
+I can see the issue — the `margin: 0 auto` edit didn't save to the file you're working from. Here's the fix, just change this one rule in your CSS:
 
-html
+```css
+.index-item img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: 80vh;
+  height: auto;
+  margin: 0 auto;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+```
+
+That's the only change needed. Here's the complete corrected file:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,6 +70,7 @@ html
       max-width: 100%;
       max-height: 80vh;
       height: auto;
+      margin: 0 auto;
       cursor: pointer;
       transition: opacity 0.15s ease;
     }
