@@ -3,126 +3,201 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title></title>
+  <title>Kyle Tidd</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { background: #fff; }
+
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 14px;
+      color: #111;
       background: #fff;
     }
-    body {
+
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: #fff;
       display: flex;
-      justify-content: center;
-      align-items: center;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 18px 20px 14px;
     }
-    img {
-      max-width: 75%;
-      max-height: 75vh;
+
+    .site-title {
+      font-size: 14px;
+      font-weight: normal;
+      text-decoration: none;
+      color: #111;
+    }
+
+    nav { display: flex; gap: 24px; }
+    nav a { font-size: 14px; color: #111; text-decoration: none; }
+    nav a:hover { text-decoration: underline; }
+
+    main { padding-top: 54px; }
+
+    .index-item { padding: 48px 20px 0; }
+    .index-item:last-child { padding-bottom: 80px; }
+
+    .index-item img {
       display: block;
-      margin: 0 auto;
+      width: 100%;
+      height: auto;
       cursor: pointer;
-      transition: opacity 300ms ease; /* smooth fade */
+      transition: opacity 0.15s ease;
+    }
+    .index-item img:hover { opacity: 0.92; }
+
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      z-index: 200;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+    #lightbox.open { display: flex; }
+
+    #lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+      display: block;
+    }
+
+    #lightbox-close {
+      position: fixed;
+      top: 18px;
+      right: 20px;
+      font-size: 14px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #111;
+      font-family: inherit;
+      padding: 4px;
+    }
+
+    footer {
+      padding: 0 20px 32px;
+      font-size: 12px;
+      color: #999;
+    }
+
+    @media (min-width: 768px) {
+      .index-item { padding: 64px 40px 0; max-width: 900px; }
+      header { padding: 20px 40px 16px; }
+      footer { padding: 0 40px 40px; }
+    }
+
+    @media (min-width: 1200px) {
+      .index-item { max-width: 780px; }
     }
   </style>
 </head>
 <body>
 
-  <img id="artwork" src="" alt="Artwork" />
+<header id="site-header">
+  <a class="site-title" href="#">Kyle Tidd</a>
+  <nav>
+    <a href="https://www.instagram.com/kyletidd" target="_blank" rel="noopener noreferrer">Contact</a>
+  </nav>
+</header>
 
-  <script>
-    // if your images are in /images/, set basePath = '/images/'
-    const basePath = ''; 
+<main id="index"></main>
 
-    // tip: standardise to lowercase extensions on disk if possible
-    const images = [
-      '20241203091002_001_C.jpg',
-      '20241203083125_001_C.jpg',
-      '20241118144232_001_C.jpg',
-      '20241203091812_001_C.jpg',
-      '20241203091914_001_C.jpg',
-      '20241203091724_001_C.jpg',
-      '20241203091219_001_C.jpg',
-      '20241203091132_001_C.jpg',
-      '20241203091047_001_C.jpg',
-      '20241203090918_001-2.jpg',
-      '20241203090833_001-2.jpg',
-      '20241203090655_001.jpg',
-      '20241203090746_001.jpg',
-      '20241203083940_001.jpg',
-      '20241203084033_001.jpg',
-      '20241118143953_001.jpg',
-      '20241118144339_001.jpg',
-      '20241203085715_001.jpg',
-      '20241203085644_001.jpg',
-      '20241203083748_001.jpg',
-      '20241203083431_001.jpg',
-      '20241203083334_001.jpg',
-      '20241203083845_001.jpg',
-      '20241203085134_001.jpg',
-      '20241203090128_001.jpg',
-      '000065400006 C.jpg',
-      '000065400007 C.jpg',
-      '000065400013 C.jpg',
-      'IMG_0778.JPG',
-      'IMG_3238.jpg',
-      'IMG_3237.jpg',
-      'IMG_1366.jpg',
-      'IMG_3242.JPG',
-      'IMG_0960.jpg',
-      'IMG_0514 2.JPG',
-      'IMG_0513.JPG',
-      '20250831145737_002.jpg',
-      '20241203090259_001.jpg',
-      'IMG_3650.jpg',
-      '20250914101539_001.jpg',
-      '20250921093719_001.jpg'
-    ];
+<footer><p>© Kyle Tidd</p></footer>
 
-    const imgEl = document.getElementById('artwork');
-    let pool = [...images]; // mutable copy for pruning broken images
+<div id="lightbox">
+  <button id="lightbox-close">Close</button>
+  <img id="lightbox-img" src="" alt="" />
+</div>
 
-    function encodedSrc(filename) {
-      // encodeURI preserves slashes, encodes spaces -> %20 etc.
-      return basePath + encodeURI(filename);
-    }
+<script>
+  const images = [
+    '20241203091002_001_C.jpg',
+    '20241203083125_001_C.jpg',
+    '20241118144232_001_C.jpg',
+    '20241203091812_001_C.jpg',
+    '20241203091914_001_C.jpg',
+    '20241203091724_001_C.jpg',
+    '20241203091219_001_C.jpg',
+    '20241203091132_001_C.jpg',
+    '20241203091047_001_C.jpg',
+    '20241203090918_001-2.jpg',
+    '20241203090833_001-2.jpg',
+    '20241203090655_001.jpg',
+    '20241203090746_001.jpg',
+    '20241203083940_001.jpg',
+    '20241203084033_001.jpg',
+    '20241118143953_001.jpg',
+    '20241118144339_001.jpg',
+    '20241203085715_001.jpg',
+    '20241203085644_001.jpg',
+    '20241203083748_001.jpg',
+    '20241203083431_001.jpg',
+    '20241203083334_001.jpg',
+    '20241203083845_001.jpg',
+    '20241203085134_001.jpg',
+    '20241203090128_001.jpg',
+    '000065400006 C.jpg',
+    '000065400007 C.jpg',
+    '000065400013 C.jpg',
+    'IMG_0778.JPG',
+    'IMG_3238.jpg',
+    'IMG_3237.jpg',
+    'IMG_1366.jpg',
+    'IMG_3242.JPG',
+    'IMG_0960.jpg',
+    'IMG_0514 2.JPG',
+    'IMG_0513.JPG',
+    '20250831145737_002.jpg',
+    '20241203090259_001.jpg',
+    'IMG_3650.jpg',
+    '20250914101539_001.jpg',
+    '20250921093719_001.jpg',
+  ];
 
-    function getRandom(exclude) {
-      if (pool.length === 0) return null;
-      if (pool.length === 1) return pool[0];
-      let next;
-      do {
-        next = pool[Math.floor(Math.random() * pool.length)];
-      } while (next === exclude);
-      return next;
-    }
+  const index = document.getElementById('index');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxClose = document.getElementById('lightbox-close');
 
-    function showImage(filename) {
-      if (!filename) return;
-      imgEl.style.opacity = 0;
-      const src = encodedSrc(filename);
-      // set up handlers before assigning src to catch immediate events
-      imgEl.onload = () => { imgEl.style.opacity = 1; };
-      imgEl.onerror = () => {
-        console.warn('failed to load:', filename, '→ removing from pool');
-        // remove bad filename from pool
-        pool = pool.filter(f => f !== filename);
-        // try another
-        const retry = getRandom(null);
-        showImage(retry);
-      };
-      imgEl.src = src;
-    }
+  images.forEach(src => {
+    const article = document.createElement('article');
+    article.className = 'index-item';
 
-    window.addEventListener('DOMContentLoaded', () => {
-      showImage(getRandom(null));
+    const img = document.createElement('img');
+    img.src = encodeURI(src);
+    img.alt = '';
+    img.loading = 'lazy';
+    img.addEventListener('click', () => {
+      lightboxImg.src = encodeURI(src);
+      lightbox.classList.add('open');
     });
 
-    imgEl.addEventListener('click', () => {
-      const current = imgEl.src.split('/').pop();
-      showImage(getRandom(current));
-    });
-  </script>
+    article.appendChild(img);
+    index.appendChild(article);
+  });
 
+  lightbox.addEventListener('click', e => {
+    if (e.target !== lightboxImg) lightbox.classList.remove('open');
+  });
+  lightboxClose.addEventListener('click', () => lightbox.classList.remove('open'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') lightbox.classList.remove('open');
+  });
+
+  const header = document.getElementById('site-header');
+  window.addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', window.scrollY > 10);
+  }, { passive: true });
+</script>
 </body>
 </html>
