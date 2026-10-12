@@ -2,50 +2,54 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#111111">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
 <title></title>
 <style>
-:root{color-scheme:dark;--ink:#101010;--gap:clamp(4px,.65vw,12px)}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--ink);min-height:100vh;overflow-x:hidden}
+html{background:#fff;scroll-behavior:smooth}
+body{margin:0;background:#fff;color:#111}
 button{font:inherit}
-#wallpaper{position:fixed;inset:-5%;z-index:-3;background-repeat:repeat;background-size:170px auto;opacity:.78;filter:contrast(1.32) saturate(1.65);transform:rotate(-3deg) scale(1.15);pointer-events:none;transition:opacity 1.1s,filter 1.1s}
-#veil{position:fixed;inset:0;z-index:-2;background:linear-gradient(130deg,rgba(0,0,0,.48),rgba(255,255,255,.08) 50%,rgba(0,0,0,.6));pointer-events:none}
-#grain{position:fixed;inset:0;z-index:10;opacity:.07;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-#canvas{width:100%;max-width:2200px;margin:auto;padding:clamp(9px,1.8vw,30px);display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-flow:dense;grid-auto-rows:clamp(28px,4.2vw,72px);gap:var(--gap);min-height:100vh}
-.tile{position:relative;grid-column:span var(--w);grid-row:span var(--h);border:0;padding:0;min-width:0;overflow:hidden;cursor:zoom-in;background:rgba(255,255,255,.06);box-shadow:0 7px 38px rgba(0,0,0,.16);transform:rotate(var(--r));isolation:isolate;transition:transform .6s cubic-bezier(.2,.8,.2,1),filter .5s,box-shadow .5s}
-.tile img{display:block;width:100%;height:100%;object-fit:cover;object-position:var(--pos);filter:var(--fx);transform:scale(1.01);transition:transform 1s cubic-bezier(.2,.8,.2,1),filter .8s}
-.tile:hover,.tile:focus-visible{z-index:5;transform:rotate(0deg) scale(1.035);box-shadow:0 14px 65px rgba(0,0,0,.5);outline:0}
-.tile:hover img,.tile:focus-visible img{transform:scale(1.085);filter:none}
-.tile:nth-child(9n){border-radius:50%}
-.tile:nth-child(13n){clip-path:polygon(0 0,100% 0,100% 80%,0 100%)}
-.tile:nth-child(17n){mix-blend-mode:screen}
-#viewer{position:fixed;inset:0;z-index:30;background:rgba(8,8,8,.94);display:none;align-items:center;justify-content:center;padding:clamp(12px,4vw,60px);cursor:zoom-out;backdrop-filter:blur(24px)}
+#wall{max-width:1580px;margin:0 auto;padding:clamp(62px,10vw,172px) clamp(22px,7vw,120px) 24vh}
+.group{display:flex;align-items:flex-start;justify-content:space-between;gap:clamp(24px,7vw,140px);margin-bottom:clamp(115px,16vw,310px);min-height:160px}
+.group:nth-child(3n+2){padding-left:clamp(0px,8vw,150px)}
+.group:nth-child(4n+3){padding-right:clamp(0px,9vw,160px)}
+.group:nth-child(5n){justify-content:center}
+.print{appearance:none;display:block;position:relative;flex:0 1 var(--width);max-width:var(--width);margin-top:var(--down);padding:0;border:0;background:transparent;cursor:zoom-in;transform:rotate(var(--tilt));transition:transform .28s ease}
+.print img{display:block;width:100%;height:auto;max-height:76vh;object-fit:contain;box-shadow:0 3px 9px rgba(0,0,0,.055);background:#f6f6f6}
+.print:after{content:'';position:absolute;top:-5px;left:50%;width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fafafa 0 19%,#929292 44%,#555 70%,#aaa 100%);box-shadow:1px 2px 3px #0002;opacity:.55;pointer-events:none}
+.print:nth-child(2):after{top:-3px;left:48%;width:7px;height:7px}
+.print:hover,.print:focus-visible{transform:rotate(0deg) translateY(-3px);outline:none;z-index:2}
+.print:focus-visible img{outline:2px solid #333;outline-offset:6px}
+.print.small{flex-basis:var(--width);align-self:flex-end}
+.print.small img{max-height:38vh}
+.print.large img{max-height:85vh}
+#viewer{position:fixed;inset:0;display:none;background:rgba(255,255,255,.97);z-index:20;align-items:center;justify-content:center;padding:6vw;cursor:zoom-out}
 #viewer.open{display:flex}
-#viewer img{max-width:100%;max-height:92dvh;object-fit:contain;box-shadow:0 20px 90px rgba(0,0,0,.38)}
-#viewer button{position:absolute;top:0;bottom:0;width:22%;border:0;background:transparent;color:transparent;cursor:pointer}
-#viewer button:focus-visible{outline:2px solid white;outline-offset:-8px}
+#viewer img{max-width:100%;max-height:88dvh;object-fit:contain}
+#viewer button{position:absolute;top:0;bottom:0;width:18%;background:transparent;border:0;cursor:pointer}
 #previous{left:0;cursor:w-resize!important}
-#following{right:0;cursor:e-resize!important}
+#next{right:0;cursor:e-resize!important}
+#viewer button:focus-visible{outline:2px solid #111;outline-offset:-8px}
 @media(max-width:700px){
- #canvas{grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:clamp(25px,8vw,54px);padding:6px;gap:5px}
- .tile{grid-column:span min(var(--w),6);grid-row:span var(--h)}
- #wallpaper{background-size:110px auto}
+ #wall{padding:75px 18px 100px}
+ .group{gap:22px;margin-bottom:115px;min-height:0}
+ .group:nth-child(n){padding-left:0;padding-right:0}
+ .group:nth-child(4n+2){padding-left:12vw}
+ .group:nth-child(5n+3){padding-right:9vw}
+ .print{margin-top:calc(var(--down) * .35);flex-basis:var(--width);max-width:var(--width)}
+ .print img{max-height:64vh}
+ .print.small img{max-height:32vh}
 }
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.print{transition:none}}
 </style>
 </head>
 <body>
-<div id="wallpaper" aria-hidden="true"></div>
-<div id="veil" aria-hidden="true"></div>
-<div id="grain" aria-hidden="true"></div>
-<main id="canvas" aria-label="Image collage"></main>
+<main id="wall" aria-label="Photographs and working images"></main>
 <div id="viewer" role="dialog" aria-modal="true" aria-label="Image viewer" tabindex="-1">
 <button id="previous" aria-label="Previous image"></button>
-<img id="view-image" alt="">
-<button id="following" aria-label="Next image"></button>
+<img id="large-image" alt="">
+<button id="next" aria-label="Next image"></button>
 </div>
 <script>
 const images = [
@@ -88,73 +92,66 @@ const images = [
     '20250914101539_001.jpg',
     '20250921093719_001.jpg',
   ];
-const canvas=document.getElementById('canvas');
-const wallpaper=document.getElementById('wallpaper');
+const wall=document.getElementById('wall');
 const viewer=document.getElementById('viewer');
-const viewImage=document.getElementById('view-image');
-const random=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
-const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=random(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
-let order=shuffle([...images.keys()]),active=0,lastFocus=null;
-let wallpaperIndex=-1;
-function setWallpaper(){
- let next=random(0,images.length-1);
- if(images.length>1&&next===wallpaperIndex)next=(next+1)%images.length;
- wallpaperIndex=next;
- wallpaper.style.opacity='0';
- setTimeout(()=>{
-  wallpaper.style.backgroundImage='url("'+encodeURI(images[next]).replace(/"/g,'%22')+'")';
-  wallpaper.style.backgroundSize=random(90,270)+'px auto';
-  wallpaper.style.filter=['contrast(1.5) saturate(1.8)','grayscale(1) contrast(2)','hue-rotate(140deg) contrast(1.8)','sepia(1) contrast(1.6)'][random(0,3)];
-  wallpaper.style.opacity='.78';
- },500);
-}
-function layout(){
- canvas.replaceChildren();
- const fragment=document.createDocumentFragment();
- order.forEach((index,n)=>{
-  const tile=document.createElement('button');
-  tile.type='button';tile.className='tile';tile.setAttribute('aria-label','Open image '+(index+1));
-  const w=[2,3,3,4,4,5,6,7,8][random(0,8)];
-  tile.style.setProperty('--w',w);
-  tile.style.setProperty('--h',random(2,6));
-  tile.style.setProperty('--r',random(-3,3)+'deg');
-  tile.style.setProperty('--pos',random(20,80)+'% '+random(20,80)+'%');
-  tile.style.setProperty('--fx',['none','none','grayscale(1) contrast(1.2)','saturate(1.8) contrast(1.2)','sepia(.85) contrast(1.3)'][random(0,4)]);
+const largeImage=document.getElementById('large-image');
+let active=0,previousFocus=null;
+const patterns=[
+ [{w:64,down:0,size:'large'}],
+ [{w:37,down:80,size:'small'},{w:44,down:0,size:''}],
+ [{w:53,down:0,size:''}],
+ [{w:30,down:145,size:'small'},{w:52,down:0,size:'large'}],
+ [{w:45,down:0,size:''}],
+ [{w:55,down:0,size:'large'},{w:24,down:165,size:'small'}],
+ [{w:37,down:0,size:'small'}],
+ [{w:43,down:95,size:''},{w:38,down:0,size:'small'}],
+ [{w:72,down:0,size:'large'}]
+];
+let index=0,section=0;
+while(index<images.length){
+ const group=document.createElement('section');
+ group.className='group';
+ const scheme=patterns[section%patterns.length];
+ for(const p of scheme){
+  if(index>=images.length)break;
+  const pos=index++;
+  const button=document.createElement('button');
+  button.type='button';
+  button.className='print '+p.size;
+  button.style.setProperty('--width',p.w+'%');
+  button.style.setProperty('--down',p.down+'px');
+  button.style.setProperty('--tilt',(((section*7+pos*3)%9)-4)*.13+'deg');
+  button.setAttribute('aria-label','View photograph '+(pos+1));
   const img=document.createElement('img');
-  img.src=encodeURI(images[index]);img.alt='';img.loading=n<10?'eager':'lazy';img.decoding='async';
-  tile.appendChild(img);
-  tile.addEventListener('click',()=>openViewer(index,tile));
-  fragment.appendChild(tile);
- });
- canvas.appendChild(fragment);
+  img.src=encodeURI(images[pos]);
+  img.alt='';
+  img.loading=pos<4?'eager':'lazy';
+  img.decoding='async';
+  button.appendChild(img);
+  button.addEventListener('click',()=>openImage(pos,button));
+  group.appendChild(button);
+ }
+ wall.appendChild(group);section++;
 }
-function openViewer(index,el){
- active=index;lastFocus=el;viewImage.src=encodeURI(images[active]);viewer.classList.add('open');viewer.focus();document.body.style.overflow='hidden';
+function openImage(pos,el){
+ active=pos;previousFocus=el;largeImage.src=encodeURI(images[active]);
+ viewer.classList.add('open');document.body.style.overflow='hidden';viewer.focus();
 }
-function closeViewer(){
- viewer.classList.remove('open');document.body.style.overflow='';viewImage.removeAttribute('src');if(lastFocus?.isConnected)lastFocus.focus();
+function closeImage(){
+ viewer.classList.remove('open');document.body.style.overflow='';
+ largeImage.removeAttribute('src');previousFocus?.focus();
 }
-function step(delta){active=(active+delta+images.length)%images.length;viewImage.src=encodeURI(images[active])}
-document.getElementById('previous').addEventListener('click',e=>{e.stopPropagation();step(-1)});
-document.getElementById('following').addEventListener('click',e=>{e.stopPropagation();step(1)});
-viewer.addEventListener('click',e=>{if(e.target===viewer||e.target===viewImage)closeViewer()});
+function move(delta){active=(active+delta+images.length)%images.length;largeImage.src=encodeURI(images[active])}
+document.getElementById('previous').addEventListener('click',e=>{e.stopPropagation();move(-1)});
+document.getElementById('next').addEventListener('click',e=>{e.stopPropagation();move(1)});
+viewer.addEventListener('click',e=>{if(e.target===viewer||e.target===largeImage)closeImage()});
 document.addEventListener('keydown',e=>{
- if(viewer.classList.contains('open')){
-  if(e.key==='Escape')closeViewer();
-  if(e.key==='ArrowLeft')step(-1);
-  if(e.key==='ArrowRight')step(1);
-  if(e.key==='Tab'){e.preventDefault();document.getElementById(e.shiftKey?'previous':'following').focus()}
- }else if(e.key.toLowerCase()==='r'){order=shuffle(order);layout();setWallpaper()}
+ if(!viewer.classList.contains('open'))return;
+ if(e.key==='Escape')closeImage();
+ if(e.key==='ArrowLeft')move(-1);
+ if(e.key==='ArrowRight')move(1);
+ if(e.key==='Tab'){e.preventDefault();document.getElementById(e.shiftKey?'previous':'next').focus()}
 });
-let lastShift=0;
-window.addEventListener('scroll',()=>{
- if(viewer.classList.contains('open'))return;
- if(window.scrollY-lastShift>window.innerHeight*1.6){lastShift=window.scrollY;setWallpaper()}
-},{passive:true});
-window.addEventListener('click',e=>{
- if(e.target===canvas||e.target===document.body){order=shuffle(order);layout();setWallpaper()}
-});
-layout();setWallpaper();
 </script>
 </body>
 </html>
