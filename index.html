@@ -19,7 +19,7 @@ button{font:inherit}
 .print img{display:block;width:100%;height:auto;max-height:76vh;object-fit:contain;box-shadow:none!important;background:transparent}
 .print:after{content:'';position:absolute;top:-4px;left:50%;width:7px;height:7px;border-radius:50%;background:#bdbdbd;opacity:.5;pointer-events:none}
 .print:hover,.print:focus-visible{transform:rotate(0deg) translateY(-2px);outline:none;z-index:2}
-.print:focus-visible img{outline:1px solid #666;outline-offset:6px}
+.print:focus img,.print:focus-visible img{outline:none!important;border:0!important;box-shadow:none!important}
 .print.small{align-self:flex-end}
 .print.small img{max-height:38vh}
 .print.large img{max-height:85vh}
