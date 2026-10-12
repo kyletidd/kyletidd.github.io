@@ -7,37 +7,37 @@
 <title></title>
 <style>
 *{box-sizing:border-box}
-html{background:#fff;scroll-behavior:smooth}
-body{margin:0;background:#fff;color:#111}
+html,body{margin:0;background:#fff;color:#111}
+html{scroll-behavior:smooth}
 button{font:inherit}
-#wall{max-width:1580px;margin:0 auto;padding:clamp(62px,10vw,172px) clamp(22px,7vw,120px) 24vh}
-.group{display:flex;align-items:flex-start;justify-content:space-between;gap:clamp(24px,7vw,140px);margin-bottom:clamp(115px,16vw,310px);min-height:160px}
+#wall{max-width:1580px;margin:0 auto;padding:clamp(62px,10vw,172px) clamp(22px,7vw,120px) 15vh}
+.group{display:flex;align-items:flex-start;justify-content:space-between;gap:clamp(24px,7vw,140px);margin-bottom:clamp(105px,15vw,275px);min-height:130px}
 .group:nth-child(3n+2){padding-left:clamp(0px,8vw,150px)}
 .group:nth-child(4n+3){padding-right:clamp(0px,9vw,160px)}
 .group:nth-child(5n){justify-content:center}
-.print{appearance:none;display:block;position:relative;flex:0 1 var(--width);max-width:var(--width);margin-top:var(--down);padding:0;border:0;background:transparent;cursor:zoom-in;transform:rotate(var(--tilt));transition:transform .28s ease}
-.print img{display:block;width:100%;height:auto;max-height:76vh;object-fit:contain;box-shadow:0 3px 9px rgba(0,0,0,.055);background:#f6f6f6}
-.print:after{content:'';position:absolute;top:-5px;left:50%;width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fafafa 0 19%,#929292 44%,#555 70%,#aaa 100%);box-shadow:1px 2px 3px #0002;opacity:.55;pointer-events:none}
-.print:nth-child(2):after{top:-3px;left:48%;width:7px;height:7px}
-.print:hover,.print:focus-visible{transform:rotate(0deg) translateY(-3px);outline:none;z-index:2}
-.print:focus-visible img{outline:2px solid #333;outline-offset:6px}
-.print.small{flex-basis:var(--width);align-self:flex-end}
+.print{appearance:none;display:block;position:relative;flex:0 1 var(--width);max-width:var(--width);margin-top:var(--down);padding:0;border:0;background:transparent;cursor:zoom-in;transform:rotate(var(--tilt));transition:transform .25s ease}
+.print img{display:block;width:100%;height:auto;max-height:76vh;object-fit:contain;box-shadow:none!important;background:transparent}
+.print:after{content:'';position:absolute;top:-4px;left:50%;width:7px;height:7px;border-radius:50%;background:#bdbdbd;opacity:.5;pointer-events:none}
+.print:hover,.print:focus-visible{transform:rotate(0deg) translateY(-2px);outline:none;z-index:2}
+.print:focus-visible img{outline:1px solid #666;outline-offset:6px}
+.print.small{align-self:flex-end}
 .print.small img{max-height:38vh}
 .print.large img{max-height:85vh}
-#viewer{position:fixed;inset:0;display:none;background:rgba(255,255,255,.97);z-index:20;align-items:center;justify-content:center;padding:6vw;cursor:zoom-out}
+#sentinel{height:1px}
+#viewer{position:fixed;inset:0;display:none;background:#fff;z-index:20;align-items:center;justify-content:center;padding:6vw;cursor:zoom-out}
 #viewer.open{display:flex}
-#viewer img{max-width:100%;max-height:88dvh;object-fit:contain}
+#viewer img{max-width:100%;max-height:88dvh;object-fit:contain;box-shadow:none}
 #viewer button{position:absolute;top:0;bottom:0;width:18%;background:transparent;border:0;cursor:pointer}
 #previous{left:0;cursor:w-resize!important}
 #next{right:0;cursor:e-resize!important}
 #viewer button:focus-visible{outline:2px solid #111;outline-offset:-8px}
 @media(max-width:700px){
- #wall{padding:75px 18px 100px}
- .group{gap:22px;margin-bottom:115px;min-height:0}
+ #wall{padding:75px 18px 60px}
+ .group{gap:22px;margin-bottom:110px;min-height:0}
  .group:nth-child(n){padding-left:0;padding-right:0}
  .group:nth-child(4n+2){padding-left:12vw}
  .group:nth-child(5n+3){padding-right:9vw}
- .print{margin-top:calc(var(--down) * .35);flex-basis:var(--width);max-width:var(--width)}
+ .print{margin-top:calc(var(--down) * .35)}
  .print img{max-height:64vh}
  .print.small img{max-height:32vh}
 }
@@ -46,6 +46,7 @@ button{font:inherit}
 </head>
 <body>
 <main id="wall" aria-label="Photographs and working images"></main>
+<div id="sentinel" aria-hidden="true"></div>
 <div id="viewer" role="dialog" aria-modal="true" aria-label="Image viewer" tabindex="-1">
 <button id="previous" aria-label="Previous image"></button>
 <img id="large-image" alt="">
@@ -93,53 +94,61 @@ const images = [
     '20250921093719_001.jpg',
   ];
 const wall=document.getElementById('wall');
+const sentinel=document.getElementById('sentinel');
 const viewer=document.getElementById('viewer');
 const largeImage=document.getElementById('large-image');
-let active=0,previousFocus=null;
-const patterns=[
- [{w:64,down:0,size:'large'}],
- [{w:37,down:80,size:'small'},{w:44,down:0,size:''}],
- [{w:53,down:0,size:''}],
- [{w:30,down:145,size:'small'},{w:52,down:0,size:'large'}],
- [{w:45,down:0,size:''}],
- [{w:55,down:0,size:'large'},{w:24,down:165,size:'small'}],
- [{w:37,down:0,size:'small'}],
- [{w:43,down:95,size:''},{w:38,down:0,size:'small'}],
- [{w:72,down:0,size:'large'}]
-];
-let index=0,section=0;
-while(index<images.length){
- const group=document.createElement('section');
- group.className='group';
- const scheme=patterns[section%patterns.length];
- for(const p of scheme){
-  if(index>=images.length)break;
-  const pos=index++;
-  const button=document.createElement('button');
-  button.type='button';
-  button.className='print '+p.size;
-  button.style.setProperty('--width',p.w+'%');
-  button.style.setProperty('--down',p.down+'px');
-  button.style.setProperty('--tilt',(((section*7+pos*3)%9)-4)*.13+'deg');
-  button.setAttribute('aria-label','View photograph '+(pos+1));
-  const img=document.createElement('img');
-  img.src=encodeURI(images[pos]);
-  img.alt='';
-  img.loading=pos<4?'eager':'lazy';
-  img.decoding='async';
-  button.appendChild(img);
-  button.addEventListener('click',()=>openImage(pos,button));
-  group.appendChild(button);
- }
- wall.appendChild(group);section++;
+const random=(min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+function shuffled(){
+ const indices=images.map((_,i)=>i);
+ for(let i=indices.length-1;i>0;i--){const j=random(0,i);[indices[i],indices[j]]=[indices[j],indices[i]]}
+ return indices;
 }
-function openImage(pos,el){
- active=pos;previousFocus=el;largeImage.src=encodeURI(images[active]);
+let queue=[],lastImage=-1,groups=0,total=0,active=0,previousFocus=null;
+function replenish(){
+ const fresh=shuffled();
+ if(fresh.length>1&&fresh[0]===lastImage){const swap=random(1,fresh.length-1);[fresh[0],fresh[swap]]=[fresh[swap],fresh[0]]}
+ queue.push(...fresh);
+}
+function takeImage(){
+ if(!queue.length)replenish();
+ const index=queue.shift();lastImage=index;return index;
+}
+function appendBatch(){
+ const fragment=document.createDocumentFragment();
+ const count=images.length;
+ for(let i=0;i<count;){
+  const group=document.createElement('section');group.className='group';
+  const remaining=count-i;
+  const items=remaining===1?1:(Math.random()<.43?2:1);
+  for(let j=0;j<items;j++){
+   const index=takeImage();i++;total++;
+   const button=document.createElement('button');
+   button.type='button';button.className='print';
+   const width=items===2?random(23,45):random(28,76);
+   button.style.setProperty('--width',width+'%');
+   button.style.setProperty('--down',random(0,items===2?125:90)+'px');
+   button.style.setProperty('--tilt',(random(-6,6)/12)+'deg');
+   if(width<40)button.classList.add('small');
+   if(width>65)button.classList.add('large');
+   button.setAttribute('aria-label','View photograph');
+   const img=document.createElement('img');
+   img.src=encodeURI(images[index]);img.alt='';img.loading=total<5?'eager':'lazy';img.decoding='async';
+   button.appendChild(img);
+   button.addEventListener('click',()=>openImage(index,button));
+   group.appendChild(button);
+  }
+  fragment.appendChild(group);groups++;
+ }
+ wall.appendChild(fragment);
+}
+function openImage(index,element){
+ active=index;previousFocus=element;largeImage.src=encodeURI(images[active]);
  viewer.classList.add('open');document.body.style.overflow='hidden';viewer.focus();
 }
 function closeImage(){
  viewer.classList.remove('open');document.body.style.overflow='';
- largeImage.removeAttribute('src');previousFocus?.focus();
+ largeImage.removeAttribute('src');
+ if(previousFocus?.isConnected)previousFocus.focus({preventScroll:true});
 }
 function move(delta){active=(active+delta+images.length)%images.length;largeImage.src=encodeURI(images[active])}
 document.getElementById('previous').addEventListener('click',e=>{e.stopPropagation();move(-1)});
@@ -152,6 +161,11 @@ document.addEventListener('keydown',e=>{
  if(e.key==='ArrowRight')move(1);
  if(e.key==='Tab'){e.preventDefault();document.getElementById(e.shiftKey?'previous':'next').focus()}
 });
+appendBatch();
+const observer=new IntersectionObserver(entries=>{
+ if(entries[0].isIntersecting&&!viewer.classList.contains('open'))appendBatch();
+},{rootMargin:'1400px 0px'});
+observer.observe(sentinel);
 </script>
 </body>
 </html>
